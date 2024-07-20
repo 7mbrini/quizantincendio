@@ -1,0 +1,26 @@
+//---------------------------------------------------------------------------
+
+#ifndef TFormSearchH
+#define TFormSearchH
+//---------------------------------------------------------------------------
+#include <System.Classes.hpp>
+#include <Vcl.Controls.hpp>
+#include <Vcl.StdCtrls.hpp>
+#include <Vcl.Forms.hpp>
+#include <Vcl.ComCtrls.hpp>
+#include <Vcl.ExtCtrls.hpp>
+//---------------------------------------------------------------------------
+class TFormSearch : public TForm
+{
+__published:	// IDE-managed Components
+	TPanel *PanelTop;
+	TPanel *PanelClient;
+	TStatusBar *StatusBar1;
+private:	// User declarations
+public:		// User declarations
+	__fastcall TFormSearch(TComponent* Owner);
+};
+//---------------------------------------------------------------------------
+extern PACKAGE TFormSearch *FormSearch;
+//---------------------------------------------------------------------------
+#endif

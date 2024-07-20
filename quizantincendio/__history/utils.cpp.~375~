@@ -1,0 +1,666 @@
+//---------------------------------------------------------------------------
+#include <vcl.h>
+#pragma hdrstop
+
+#include "utils.h"
+#include "TFormMain.h"
+#include "TFormDebug.h"
+#include "TFormDBRecord.h"
+
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TUtils::LoadDataTest()
+{
+	assert(FormMain);
+
+//    FormMain->LoadDB();
+
+    FormMain->MakeNewQuiz();
+    //FormMain->PrintDB(FormMain->m_DB);
+//FormDebug->Print(FormMain->m_DB);
+
+    //LoadDB(); ShowMessage(m_DB.size()); PrintDB(m_DB);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TUtils::BuildThePosterMidRes(AnsiString strPath, AnsiString strFileName)
+{
+/*
+	assert(FormMain);
+	assert(FormDebug);
+
+//    FormMain->LoadDB();
+
+//ShowMessage(FormMain->m_DB.size());
+	TVecInt RecIds;
+    int nCount = 100;
+                                    // select from ALL questions with figures (sequentially)
+    FormMain->SelectQuestionsWithFigures(FormMain->m_DB, RecIds, nCount);
+
+	TVecPtrDBRecords Records;
+
+    for(int i=0; i<RecIds.size(); i++)
+    {
+		Records.push_back( &FormMain->m_DB[RecIds[i]] );
+    }
+
+
+	TFormDBRecord *pRecord = new TFormDBRecord(NULL);
+    assert(pRecord);
+pRecord->Visible = true;
+int nFontSize = 14;
+//pRecord->MemoQuestion->Font->Size = nFontSize;
+pRecord->SetFontSize(nFontSize);
+float ScaleF = 1.2f;
+pRecord->MemoQuestion->Width *= ScaleF;
+pRecord->MemoAnswer1->Width *= ScaleF;
+pRecord->MemoAnswer2->Width *= ScaleF;
+pRecord->MemoAnswer3->Width *= ScaleF;
+
+
+	TVecPtrBitmaps Images;
+
+	for(int i=0; i<Records.size(); i++)
+    {
+        TBitmap *pBmp = new TBitmap;
+        assert(pBmp);
+        Images.push_back(pBmp);
+
+		pRecord->SetRecord( Records[i] );
+
+//		AnsiString strId, strOrgId;
+//        strId.printf("  Q %03d", i+1);
+//		strOrgId.printf("%d", Records[i]->nId);
+//		pRecord->SetLabels(strId, strOrgId);
+
+
+        pRecord->MemoQuestion->Text = Records[i]->strQuestion;
+		pRecord->MemoAnswer1->Text = Records[i]->strAnswers[0];
+		pRecord->MemoAnswer2->Text = Records[i]->strAnswers[1];
+		pRecord->MemoAnswer3->Text = Records[i]->strAnswers[2];
+
+                            				// load the image
+        if( Records[i]->bImage )
+        {
+            TMemoryStream *pMs = new TMemoryStream;
+            assert(pMs);
+
+            pMs->Write(Records[i]->Image, Records[i]->nImgSize);
+
+            pMs->Position = 0L;
+
+            TWICImage *pWic = new TWICImage;
+            assert(pWic);
+            pWic->LoadFromStream(pMs);
+
+            pRecord->Image->Picture->Bitmap->Assign(pWic);
+
+            delete pWic;
+
+            pRecord->Image->Update();
+
+            delete pMs;
+        }
+
+											// imposta id figura e id domanda
+		AnsiString strLabel;
+        strLabel.printf("F %d / D %d", i + 1, Records[i]->nId);
+		pRecord->Print(pBmp, strLabel);
+    }
+
+#ifdef _DEBUG_
+	assert(Images.size());
+    FormDebug->SetOpMode(dmBitmap);
+    FormDebug->Print(Images[0]);
+#endif
+
+
+//int nRows = 10;
+//int nPages = 5;
+//int nRows = 5;
+int nRows = 8;
+int nPages = 7;
+    TVecPtrBitmaps Bitmaps, Pages;
+
+											// crea le "pagine"
+    for(int k=0; k<nPages; k++)
+    {
+        Bitmaps.clear();
+
+        for(int i=k*2*nRows; i<(k+1)*2*nRows; i++)
+        {
+            if( i>= Images.size() ) break;
+
+            Bitmaps.push_back(Images[i]);
+        }
+
+        TBitmap *pPage = PrintThePosterMidRes(Bitmaps, nRows);
+        assert(pPage);
+        Pages.push_back(pPage);
+    }
+
+											// infine salva le diverse pagine (posters)
+
+	for(int i=0; i<Pages.size(); i++)
+    {
+		AnsiString strAppend;
+        strAppend.printf("_%02d.bmp", i+1);
+        Pages[i]->SaveToFile( strPath + strFileName + strAppend );
+    }
+*/
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+TBitmap* __fastcall TUtils::PrintThePosterMidRes(TVecPtrBitmaps Images, int nRows)
+{
+											// build the poster (the BIG bitmap)
+	int nWidth = 2480;
+    int nHeight = 3425;
+
+    TBitmap *pPage = new TBitmap;
+    assert(pPage);
+
+    pPage->Width = nWidth;
+    pPage->Height = nHeight;
+
+	//int nDY = 96;
+//int nDY = 256;
+//int nDY = 32;	// se fontsize = 14
+int nDY = 128;
+//int nDX = 32;
+int nDX = 8;
+
+//float ScaleF = 1.5f;
+float ScaleF = 1.45f;
+
+	for(int i=0; i<Images.size(); i++)
+    {
+        TRect BmpRect = TRect(0, 0, Images[i]->Width, Images[i]->Height);
+        TRect DstRect = BmpRect;
+        //int nX = i < nRows ? 300 : 1300;
+//int nX = i < nRows ? 128 : 1300;	// se fontsize = 14;
+//int nX = i < nRows ? nDX : 1300;	// se fontsize = 14;
+int nX = i < nRows ? nDX : 1240;	// se fontsize = 14;
+//        int nY = i < nRows ? i * BmpRect.Height() : (i-nRows) * BmpRect.Height();
+int nY = i < nRows ? i * BmpRect.Height()*ScaleF : (i-nRows) * BmpRect.Height()*ScaleF;
+        DstRect.SetLocation(nX, nDY + nY );
+
+        //pPage->Canvas->CopyRect(DstRect, Images[i]->Canvas, BmpRect);
+//DstRect.Width = 2*DstRect.Width();
+DstRect.SetWidth(DstRect.Width()*ScaleF);
+DstRect.SetHeight(DstRect.Height()*ScaleF);
+pPage->Canvas->StretchDraw(DstRect, Images[i]);
+    }
+
+    return pPage;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TUtils::BuildThePosterLowRes(AnsiString strPath, AnsiString strFileName)
+{
+/*
+	assert(FormMain);
+	assert(FormDebug);
+
+//    FormMain->LoadDB();
+
+//ShowMessage(FormMain->m_DB.size());
+	TVecInt RecIds;
+    int nCount = 100;
+                                    // select from ALL questions with figures (sequentially)
+    FormMain->SelectQuestionsWithFigures(FormMain->m_DB, RecIds, nCount);
+
+	TVecPtrDBRecords Records;
+
+    for(int i=0; i<RecIds.size(); i++)
+    {
+		Records.push_back( &FormMain->m_DB[RecIds[i]] );
+    }
+
+
+	TFormDBRecord *pRecord = new TFormDBRecord(NULL);
+    assert(pRecord);
+//pRecord->Visible = true;
+pRecord->Visible = false;
+//int nFontSize = 14;
+int nFontSize = 20;
+//pRecord->MemoQuestion->Font->Size = nFontSize;
+pRecord->SetFontSize(nFontSize);
+//float ScaleF = 1.2f;
+pRecord->Width *= 2.0f;
+float ScaleF = 2.75f;
+pRecord->MemoQuestion->Width *= ScaleF;
+pRecord->MemoAnswer1->Width *= ScaleF;
+pRecord->MemoAnswer2->Width *= ScaleF;
+pRecord->MemoAnswer3->Width *= ScaleF;
+
+
+	TVecPtrBitmaps Images;
+
+	for(int i=0; i<Records.size(); i++)
+    {
+        TBitmap *pBmp = new TBitmap;
+        assert(pBmp);
+        Images.push_back(pBmp);
+
+		pRecord->SetRecord( Records[i] );
+
+//		AnsiString strId, strOrgId;
+//        strId.printf("  Q %03d", i+1);
+//		strOrgId.printf("%d", Records[i]->nId);
+//		pRecord->SetLabels(strId, strOrgId);
+
+
+        pRecord->MemoQuestion->Text = Records[i]->strQuestion;
+		pRecord->MemoAnswer1->Text = Records[i]->strAnswers[0];
+		pRecord->MemoAnswer2->Text = Records[i]->strAnswers[1];
+		pRecord->MemoAnswer3->Text = Records[i]->strAnswers[2];
+
+                            				// load the image
+        if( Records[i]->bImage )
+        {
+            TMemoryStream *pMs = new TMemoryStream;
+            assert(pMs);
+
+            pMs->Write(Records[i]->Image, Records[i]->nImgSize);
+
+            pMs->Position = 0L;
+
+            TWICImage *pWic = new TWICImage;
+            assert(pWic);
+            pWic->LoadFromStream(pMs);
+
+            pRecord->Image->Picture->Bitmap->Assign(pWic);
+
+            delete pWic;
+
+            pRecord->Image->Update();
+
+            delete pMs;
+        }
+
+											// imposta id figura e id domanda
+		AnsiString strLabel;
+        strLabel.printf("F %d / D %d", i + 1, Records[i]->nId);
+		pRecord->Print(pBmp, strLabel);
+    }
+
+
+//#ifdef _DEBUG_
+//	assert(Images.size());
+//    FormDebug->SetOpMode(dmBitmap);
+//    FormDebug->Print(Images[0]);
+//#endif
+
+
+//int nRows = 10;
+//int nPages = 5;
+//int nRows = 5;
+int nRows = 8;
+int nPages = 13;
+    TVecPtrBitmaps Bitmaps, Pages;
+
+											// crea le "pagine"
+    for(int k=0; k<nPages; k++)
+    {
+        Bitmaps.clear();
+
+        //for(int i=k*2*nRows; i<(k+1)*2*nRows; i++)
+for(int i=k*nRows; i<(k+1)*nRows; i++)
+        {
+            if( i>= Images.size() ) break;
+
+            Bitmaps.push_back(Images[i]);
+        }
+
+        TBitmap *pPage = PrintThePoster(Bitmaps, nRows);
+        assert(pPage);
+        Pages.push_back(pPage);
+    }
+
+											// infine salva le diverse pagine (posters)
+
+
+	for(int i=0; i<Pages.size(); i++)
+    {
+		AnsiString strAppend;
+        strAppend.printf("_%02d.bmp", i+1);
+//Pages[i]->SaveToFile( strPath + strFileName + strAppend );
+    }
+
+#ifdef _DEBUG_
+FormDebug->SetOpMode(dmBitmap);
+FormDebug->Image->Stretch = true;
+FormDebug->Print(Pages[4]);
+#endif
+*/
+
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+TBitmap* __fastcall TUtils::PrintThePosterLowRes(TVecPtrBitmaps Images, int nRows)
+{
+											// build the poster (the BIG bitmap)
+	int nWidth = 2480;
+    int nHeight = 3425;
+
+    TBitmap *pPage = new TBitmap;
+    assert(pPage);
+
+    pPage->Width = nWidth;
+    pPage->Height = nHeight;
+
+	//int nDY = 96;
+//int nDY = 256;
+//int nDY = 32;	// se fontsize = 14
+int nDY = 128;
+//int nDX = 32;
+int nDX = 8;
+
+//float ScaleF = 1.5f;
+float ScaleF = 1.45f;
+
+	for(int i=0; i<Images.size(); i++)
+    {
+        TRect BmpRect = TRect(0, 0, Images[i]->Width, Images[i]->Height);
+        TRect DstRect = BmpRect;
+        //int nX = i < nRows ? 300 : 1300;
+/*
+//int nX = i < nRows ? 128 : 1300;	// se fontsize = 14;
+//int nX = i < nRows ? nDX : 1300;	// se fontsize = 14;
+int nX = i < nRows ? nDX : 1240;	// se fontsize = 14;
+//        int nY = i < nRows ? i * BmpRect.Height() : (i-nRows) * BmpRect.Height();
+int nY = i < nRows ? i * BmpRect.Height()*ScaleF : (i-nRows) * BmpRect.Height()*ScaleF;
+*/
+int nX = nDX;
+int nY = i*BmpRect.Height()*ScaleF;
+
+        DstRect.SetLocation(nX, nDY + nY );
+
+        //pPage->Canvas->CopyRect(DstRect, Images[i]->Canvas, BmpRect);
+//DstRect.Width = 2*DstRect.Width();
+DstRect.SetWidth(DstRect.Width()*ScaleF);
+DstRect.SetHeight(DstRect.Height()*ScaleF);
+pPage->Canvas->StretchDraw(DstRect, Images[i]);
+    }
+
+    return pPage;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:	Stampa alle dimensioni piu` grandi ( circa 5 domande per pagina )
+//---------------------------------------------------------------------------
+void __fastcall TUtils::BuildThePoster(AnsiString strPath, AnsiString strFileName)
+{
+/*
+	assert(FormMain);
+	assert(FormDebug);
+
+//    FormMain->LoadDB();
+
+#ifdef _DEBUG_
+    AnsiString strTemp;
+    strTemp.printf("Total records: %d", FormMain->m_DB.size());
+    FormDebug->SetOpMode(dmText);
+    FormDebug->Visible = true;
+    FormDebug->Add(strTemp);
+#endif
+
+	TVecInt RecIds;
+    int nCount = 100;
+                                    // select from ALL questions with figures (sequentially)
+    FormMain->SelectQuestionsWithFigures(FormMain->m_DB, RecIds, nCount);
+
+	TVecPtrDBRecords Records;
+
+    for(int i=0; i<RecIds.size(); i++)
+    {
+		Records.push_back( &FormMain->m_DB[RecIds[i]] );
+    }
+
+
+	TFormDBRecord *pRecord = new TFormDBRecord(NULL);
+    assert(pRecord);
+	pRecord->Visible = false;
+	int nFontSize = 20;
+	pRecord->SetFontSize(nFontSize);
+
+	pRecord->Width *= 2.0f;
+pRecord->Height *= 1.25f;
+//float ScaleF = 2.75f;
+float ScaleF = 2.5f;
+    pRecord->MemoQuestion->Width *= ScaleF;
+    pRecord->MemoAnswer1->Width *= ScaleF;
+    pRecord->MemoAnswer2->Width *= ScaleF;
+    pRecord->MemoAnswer3->Width *= ScaleF;
+
+
+											// salva in images i diversi record di dati
+	TVecPtrBitmaps Images;
+
+	for(int i=0; i<Records.size(); i++)
+    {
+        TBitmap *pBmp = new TBitmap;
+        assert(pBmp);
+        Images.push_back(pBmp);
+
+		pRecord->SetRecord( Records[i] );
+
+//		AnsiString strId, strOrgId;
+//        strId.printf("  Q %03d", i+1);
+//		strOrgId.printf("%d", Records[i]->nId);
+//		pRecord->SetLabels(strId, strOrgId);
+
+
+        pRecord->MemoQuestion->Text = Records[i]->strQuestion;
+		pRecord->MemoAnswer1->Text = Records[i]->strAnswers[0];
+		pRecord->MemoAnswer2->Text = Records[i]->strAnswers[1];
+		pRecord->MemoAnswer3->Text = Records[i]->strAnswers[2];
+
+                            				// load the image
+        if( Records[i]->bImage )
+        {
+            TMemoryStream *pMs = new TMemoryStream;
+            assert(pMs);
+
+            pMs->Write(Records[i]->Image, Records[i]->nImgSize);
+
+            pMs->Position = 0L;
+
+            TWICImage *pWic = new TWICImage;
+            assert(pWic);
+            pWic->LoadFromStream(pMs);
+
+            pRecord->Image->Picture->Bitmap->Assign(pWic);
+
+            delete pWic;
+
+            pRecord->Image->Update();
+
+            delete pMs;
+        }
+
+											// imposta id figura e id domanda
+		AnsiString strLabel;
+        strLabel.printf("F %d / D %d", i + 1, Records[i]->nId);
+		pRecord->Print(pBmp, strLabel);
+    }
+
+
+//#ifdef _DEBUG_
+//	assert(Images.size());
+//    FormDebug->SetOpMode(dmBitmap);
+//    FormDebug->Print(Images[0]);
+//#endif
+
+
+											// suddivide le immagini per pagine
+                                            // di n righe ciascuna
+//int nRows = 8;
+//int nPages = 13;
+int nRows = 7;
+int nPages = 14;
+
+    TVecPtrBitmaps Bitmaps, Pages;
+
+											// crea le "pagine"
+    for(int k=0; k<nPages; k++)
+    {
+        Bitmaps.clear();
+
+		for(int i=k*nRows; i<(k+1)*nRows; i++)
+        {
+            if( i>= Images.size() ) break;
+
+            Bitmaps.push_back(Images[i]);
+        }
+
+        TBitmap *pPage = PrintThePoster(Bitmaps, nRows);
+        assert(pPage);
+        Pages.push_back(pPage);
+    }
+											// infine salva su file le diverse pagine (posters)
+	for(int i=0; i<Pages.size(); i++)
+    {
+		AnsiString strAppend;
+        strAppend.printf("_%02d.bmp", i+1);
+Pages[i]->SaveToFile( strPath + strFileName + strAppend );
+    }
+
+#ifdef _DEBUG_
+    FormDebug->SetOpMode(dmBitmap);
+    FormDebug->Image->Stretch = true;
+    FormDebug->Print(Pages[4]);
+#endif
+*/
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+TBitmap* __fastcall TUtils::PrintThePoster(TVecPtrBitmaps Images, int nRows)
+{
+											// build the poster (the BIG bitmap)
+	int nWidth = 2480;
+    int nHeight = 3425;
+
+    TBitmap *pPage = new TBitmap;
+    assert(pPage);
+
+    pPage->Width = nWidth;
+    pPage->Height = nHeight;
+
+	//int nDY = 96;
+//int nDY = 256;
+//int nDY = 32;	// se fontsize = 14
+
+//int nDY = 128;
+int nDY = 2;
+
+//int nDX = 32;
+int nDX = 8;
+
+//float ScaleF = 1.5f;
+float ScaleF = 1.45f;
+
+	for(int i=0; i<Images.size(); i++)
+    {
+        TRect BmpRect = TRect(0, 0, Images[i]->Width, Images[i]->Height);
+        TRect DstRect = BmpRect;
+        //int nX = i < nRows ? 300 : 1300;
+/*
+//int nX = i < nRows ? 128 : 1300;	// se fontsize = 14;
+//int nX = i < nRows ? nDX : 1300;	// se fontsize = 14;
+int nX = i < nRows ? nDX : 1240;	// se fontsize = 14;
+//        int nY = i < nRows ? i * BmpRect.Height() : (i-nRows) * BmpRect.Height();
+int nY = i < nRows ? i * BmpRect.Height()*ScaleF : (i-nRows) * BmpRect.Height()*ScaleF;
+*/
+int nX = nDX;
+int nY = i*BmpRect.Height()*ScaleF;
+
+        DstRect.SetLocation(nX, nDY + nY );
+
+        //pPage->Canvas->CopyRect(DstRect, Images[i]->Canvas, BmpRect);
+//DstRect.Width = 2*DstRect.Width();
+DstRect.SetWidth(DstRect.Width()*ScaleF);
+DstRect.SetHeight(DstRect.Height()*ScaleF);
+pPage->Canvas->StretchDraw(DstRect, Images[i]);
+    }
+
+    return pPage;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+bool __fastcall TUtils::IsUnique(TVecInt& Ids)
+{
+	bool bResult = true;
+
+	for(int i=0; i<Ids.size() - 1; i++)
+    {
+
+		for( int j = i+1; j < Ids.size(); j++ )
+        {
+			if( Ids[i] == Ids[j] )
+            {
+            	bResult = false;
+                break;
+        	}
+        }
+    }
+
+    return bResult;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+bool __fastcall TUtils::IsUnique(int nId, TVecInt& Ids)
+{
+	bool bResult = true;
+
+	for(int i=0; i<Ids.size(); i++)
+    {
+		if( Ids[i] == nId )
+        {
+        	bResult = false;
+            break;
+        }
+    }
+
+    return bResult;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TUtils::Remove(int nIndex, TVecInt& Ids)
+{
+	TVecInt Temp;
+
+    for(int i=0; i<Ids.size(); i++)
+    {
+        if( i != nIndex )
+        {
+	        Temp.push_back( Ids[i] );
+        }
+    }
+
+    Ids = Temp;
+}
+
+

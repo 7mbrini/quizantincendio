@@ -1,0 +1,66 @@
+//---------------------------------------------------------------------------
+
+#ifndef TDlgSetupH
+#define TDlgSetupH
+//---------------------------------------------------------------------------
+#include <System.Classes.hpp>
+#include <Vcl.Controls.hpp>
+#include <Vcl.StdCtrls.hpp>
+#include <Vcl.Forms.hpp>
+#include <Vcl.ExtCtrls.hpp>
+#include <Vcl.Buttons.hpp>
+#include <Vcl.Dialogs.hpp>
+//---------------------------------------------------------------------------
+class TDlgSetup : public TForm
+{
+__published:	// IDE-managed Components
+	TButton *ButtonOk;
+	TEdit *EditQuizCount;
+	TLabel *LabelQuizCount;
+	TBevel *Bevel1;
+	TLabel *LabelTopic;
+	TComboBox *ComboBoxChoice;
+	TCheckBox *CheckBoxCorrectInstantly;
+	TCheckBox *CheckBoxAutoScroll;
+	void __fastcall ButtonOkClick(TObject *Sender);
+	void __fastcall FormCreate(TObject *Sender);
+	void __fastcall EditQuizCountKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+	void __fastcall ComboBoxChoiceChange(TObject *Sender);
+	void __fastcall CheckBoxIndexFromFileClick(TObject *Sender);
+
+private:	// User declarations
+
+public:		// User declarations
+	__fastcall TDlgSetup(TComponent* Owner);
+
+public:
+	int __fastcall GetCount();
+
+	void __fastcall EnableControls(bool bEnable);
+	void __fastcall SetMaxQuestions(int nMaxQuestions);
+
+    bool __fastcall IsExamSimulation() { return ComboBoxChoice->ItemIndex == 2; }
+	bool __fastcall IsInstantCorrection() { return CheckBoxCorrectInstantly->Checked; }
+	bool __fastcall IsAutoScroll() { return CheckBoxAutoScroll->Checked; }
+
+/*
+    bool __fastcall IsIndexFromFile()
+    {
+    	return bool( CheckBoxIndexFromFile->Checked && EditIndexFile->Text.Length() );
+	}
+*/
+
+	void __fastcall Reset();
+
+protected:
+	int m_nMaxQuestions;
+	AnsiString m_strIndexFile;
+
+	void __fastcall ValidateInput();
+};
+
+//---------------------------------------------------------------------------
+extern PACKAGE TDlgSetup *DlgSetup;
+//---------------------------------------------------------------------------
+
+#endif

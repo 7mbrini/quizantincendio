@@ -1,0 +1,59 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+#include <tchar.h>
+//---------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+USEFORM("TFormDBSearch.cpp", FormDBSearch);
+USEFORM("TFormDBRecord.cpp", FormDBRecord);
+USEFORM("TDlgSetup.cpp", DlgSetup);
+USEFORM("TFormMain.cpp", FormMain);
+USEFORM("TFormDebug.cpp", FormDebug);
+USEFORM("TDlgAbout.cpp", DlgAbout);
+USEFORM("TDatabanker.cpp", Databanker); /* TDataModule: File Type */
+//---------------------------------------------------------------------------
+#ifdef _WIN64
+WINAPI int _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
+#else
+WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
+#endif
+{
+	try
+	{
+		Application->Initialize();
+		Application->MainFormOnTaskBar = true;
+		Application->CreateForm(__classid(TFormMain), &FormMain);
+		Application->CreateForm(__classid(TDatabanker), &Databanker);
+		Application->Run();
+	}
+	catch (Exception &exception)
+	{
+		Application->ShowException(&exception);
+	}
+	catch (...)
+	{
+		try
+		{
+			throw Exception("");
+		}
+		catch (Exception &exception)
+		{
+			Application->ShowException(&exception);
+		}
+	}
+	return 0;
+}
+//---------------------------------------------------------------------------

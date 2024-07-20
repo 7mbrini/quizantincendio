@@ -1,0 +1,245 @@
+object FormDBRecord: TFormDBRecord
+  Left = 49
+  Top = 116
+  BorderStyle = bsNone
+  Caption = 'DB Record'
+  ClientHeight = 270
+  ClientWidth = 850
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Position = poDesigned
+  OnCreate = FormCreate
+  OnMouseDown = FormMouseDown
+  TextHeight = 13
+  object Image: TImage
+    Left = 632
+    Top = 80
+    Width = 200
+    Height = 150
+  end
+  object LabelId: TLabel
+    Left = 26
+    Top = 8
+    Width = 66
+    Height = 25
+    AutoSize = False
+    Caption = 'LabelId'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object LabelOrgId: TLabel
+    Left = 40
+    Top = 33
+    Width = 52
+    Height = 19
+    AutoSize = False
+    Caption = 'LabelId'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object SpeedButtonHelp: TSpeedButton
+    Left = 632
+    Top = 8
+    Width = 28
+    Height = 28
+    Hint = 'Help'
+    AllowAllUp = True
+    GroupIndex = 1
+    Caption = '?'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+    OnClick = SpeedButtonHelpClick
+  end
+  object MemoQuestion: TMemo
+    Left = 97
+    Top = 4
+    Width = 520
+    Height = 70
+    TabStop = False
+    BevelKind = bkFlat
+    Color = clInfoBk
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -17
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    PopupMenu = DefPopupMenu
+    ReadOnly = True
+    TabOrder = 0
+    OnKeyDown = MemoQuestionKeyDown
+    OnMouseDown = MemoQuestionMouseDown
+    OnMouseMove = MemoQuestionMouseMove
+  end
+  object MemoAnswer1: TMemo
+    Left = 97
+    Top = 80
+    Width = 520
+    Height = 58
+    TabStop = False
+    Color = clCream
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    PopupMenu = DefPopupMenu
+    ReadOnly = True
+    TabOrder = 1
+    OnMouseMove = MemoAnswer1MouseMove
+  end
+  object MemoAnswer2: TMemo
+    Left = 97
+    Top = 140
+    Width = 520
+    Height = 58
+    TabStop = False
+    Color = clCream
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    PopupMenu = DefPopupMenu
+    ReadOnly = True
+    TabOrder = 2
+    OnMouseMove = MemoAnswer2MouseMove
+  end
+  object MemoAnswer3: TMemo
+    Left = 97
+    Top = 200
+    Width = 520
+    Height = 58
+    TabStop = False
+    Color = clCream
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    PopupMenu = DefPopupMenu
+    ReadOnly = True
+    TabOrder = 3
+    OnMouseMove = MemoAnswer3MouseMove
+  end
+  object CheckBox1: TCheckBox
+    Left = 71
+    Top = 98
+    Width = 20
+    Height = 24
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -24
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 4
+    OnClick = CheckBox1Click
+  end
+  object CheckBox2: TCheckBox
+    Left = 71
+    Top = 156
+    Width = 20
+    Height = 24
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -24
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 5
+    OnClick = CheckBox2Click
+  end
+  object CheckBox3: TCheckBox
+    Left = 71
+    Top = 214
+    Width = 20
+    Height = 24
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -24
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 6
+    OnClick = CheckBox3Click
+  end
+  object RichEditComment: TRichEdit
+    Left = 632
+    Top = 41
+    Width = 200
+    Height = 218
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssVertical
+    TabOrder = 7
+    Visible = False
+    WantReturns = False
+    OnSelectionChange = RichEditCommentSelectionChange
+  end
+  object RadioButton1: TRadioButton
+    Left = 20
+    Top = 88
+    Width = 113
+    Height = 17
+    Caption = 'RadioButton1'
+    TabOrder = 8
+  end
+  object RadioButton2: TRadioButton
+    Left = 20
+    Top = 144
+    Width = 113
+    Height = 17
+    Caption = 'RadioButton2'
+    TabOrder = 9
+  end
+  object RadioButton3: TRadioButton
+    Left = 20
+    Top = 204
+    Width = 113
+    Height = 17
+    Caption = 'RadioButton3'
+    TabOrder = 10
+  end
+  object PopupMenu: TPopupMenu
+    Left = 664
+    Top = 68
+    object PopupUpdateRecord: TMenuItem
+      Caption = '&Update Record'
+      OnClick = PopupUpdateRecordClick
+    end
+    object PopupSaveDatabase: TMenuItem
+      Caption = '&Save Database ...'
+    end
+  end
+  object DefPopupMenu: TPopupMenu
+    Left = 666
+    Top = 134
+  end
+end

@@ -1,0 +1,551 @@
+/******************************************************************************
+	NAME:			TDataBanker.cpp
+	MAIN PROJECT:   Quiz Antincendio - Quiz per il Corso Antincendio VVFF
+	DESCRIPTION:	Database management and facilities
+	EXETYPE:        For 32 & 64 bit Windows platforms.
+	AUTHOR:         (C) 2024 Francesco Settembrini
+					francesco.settembrini@poliba.it
+
+	DATA:           July 2024
+	RELEASE:        1.0.0
+	LAST UPDATE:
+
+	COMPILER:       Borland/CodeGear/Embarcadero Rad Studio XE.
+
+	DETAILS:
+
+	NOTES:
+	  - Il presente lavoro e` protetto dalle leggi internazionali
+	  sui diritti d'autore. Nessuna parte puo` essere copiata
+	  senza il permesso esplicito dell'autore.
+
+	  - This work is protected by international laws on copy-rights.
+	  No parts can be copied without explicit permission of the author.
+
+******************************************************************************/
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "utils.h"
+#include "TDatabanker.h"
+
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma classgroup "System.Classes.TPersistent"
+#pragma resource "*.dfm"
+TDataBanker *DataBanker;
+
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+__fastcall TDataBanker::TDataBanker(TComponent* Owner) : TDataModule(Owner)
+{
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+bool __fastcall TDataBanker::LoadDB(AnsiString strFileName)
+{
+	Clear();
+
+	//return LoadDB(strFileName, m_DB, m_strTopics);
+	return LoadDB(strFileName, m_DB, m_Topics);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+int __fastcall TDataBanker::GetQuestionsPerTopic(int nTopicId)
+{
+	int nCount = 0;
+
+    for(int i=0; i<m_DB.size(); i++)
+    {
+		if( m_DB[i].nTopicId == nTopicId )
+        {
+			nCount++;
+        }
+    }
+
+    return nCount;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:	Ottiene il numero di domande per argomento; restituisce il totale
+//---------------------------------------------------------------------------
+int __fastcall TDataBanker::GetQuestionsCount(TVecInt& Counts)
+{
+	Counts.clear();
+
+	//for(int i=0; i<m_strTopics.size(); i++)
+    for(int i=0; i<m_Topics.size(); i++)
+    {
+		//int nCount = GetQuestionsPerTopic(i);
+//int nCount = GetQuestionsPerTopic(i+1); // i "topics" sono a indice 1
+		int nCount = GetQuestionsPerTopic( m_Topics[i].nId );
+        Counts.push_back(nCount);
+    }
+
+    int nSum = 0;
+    for(int i=0; i<Counts.size(); i++)
+    {
+		nSum += Counts[i];
+    }
+											// un piccolo check:  la somma delle
+                                            // domande per singolo argomento deve
+                                            // esser pari al numero totale di domande!
+    assert( (nSum) == m_DB.size() );
+
+    return nSum;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+bool __fastcall TDataBanker::HaveTopics()
+{
+	//return m_strTopics.size();
+    return m_Topics.size();
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+//int __fastcall TDataBanker::GetTopics(TVecStrings& strTopics)
+int __fastcall TDataBanker::GetTopics(TVecTopics& Topics)
+{
+	//strTopics = m_strTopics;
+    Topics = m_Topics;
+    //return strTopics.size();
+    return Topics.size();
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+//bool __fastcall TDataBanker::LoadDB(AnsiString strFileName, TVecDBRecords& Records, TVecStrings& Topics)
+bool __fastcall TDataBanker::LoadDB(AnsiString strFileName, TVecDBRecords& Records, TVecTopics& Topics)
+{
+	bool bResult = false;
+
+	FILE* fp = fopen( strFileName.c_str(), "rb");
+    assert(fp);
+
+    TagFileHeader Header;
+    memset(&Header, 0, sizeof(Header));
+    fread(&Header, sizeof(Header), 1, fp);
+
+	m_Topics.clear();
+
+    if( AnsiString(Header.strMagic) == AnsiString(MAGIC) )
+    {
+/*
+        if( Header.nTopics > 0 )
+        {
+            for(int i=0; i<Header.nTopics; i++)
+            {
+				//m_strTopics.push_back( AnsiString(Header.strTopics[i]) );
+				m_Topics.push_back( Header.Topics[i] );
+            }
+        }
+*/
+
+		for(int i=0; i<Header.nRecords; i++)
+        {
+			TDBRecord Record;
+
+            fread(&Record, sizeof(Record), 1, fp);
+            Records.push_back(Record);
+
+            if( feof(fp) ) break;
+        }
+
+        bResult = true;
+    }
+
+    fclose(fp);
+
+    return bResult;
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SaveDB(AnsiString strFileName, TVecDBRecords& Records, TVecStrings strTopics)
+{
+	FILE *fp = fopen(strFileName.c_str(), "wb");
+    assert(fp);
+
+	TagFileHeader Header;
+	memset(&Header, 0, sizeof(Header));
+
+	wcscpy(Header.strMagic, MAGIC);
+    Header.nRecords = Records.size();
+//	Header.nTopics = strTopics.size();
+
+/*
+	for(int i=0; i<strTopics.size(); i++)
+    {
+		//wcscpy( Header.strTopics[i], UnicodeString(strTopics[i]).c_str() );
+		wcscpy( Header.Topics[i].strTopic, UnicodeString(strTopics[i]).c_str() );
+    }
+*/
+
+	fwrite(&Header, sizeof(Header), 1, fp);
+
+    for(int i=0; i<Records.size(); i++)
+    {
+		fwrite(&Records[i], sizeof(Records[i]), 1, fp);
+    }
+
+    fclose(fp);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::Clear()
+{
+	m_DB.clear();
+	//m_strTopics.clear();
+    m_Topics.clear();
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(TVecDBRecords& Records, TVecInt& SelRecs)
+{
+	for(int i=0; i<Records.size(); i++)
+    {
+		SelRecs.push_back(i);
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:	SelRec conterra' i primi nCount indice del database delle domande
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(TVecDBRecords& Records,
+	TVecInt& SelRecs, int nCount)
+{
+	for(int i=0; i<nCount; i++)
+    {
+		SelRecs.push_back(i);
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(TVecDBRecords& Records,
+	int nTopicId, TVecInt& SelRecs)
+{
+	for(int i=0; i<Records.size(); i++)
+    {
+		if( Records[i].nTopicId == nTopicId )
+        {
+        	SelRecs.push_back( i );
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(TVecDBRecords& Records,
+	int nTopicId, TVecInt& SelRecs, int nCount)
+{
+	for(int i=0; i<Records.size(); i++)
+    {
+		if( SelRecs.size() > nCount ) break;
+
+		if( Records[i].nTopicId == nTopicId )
+        {
+        	SelRecs.push_back( i );
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsRnd(TVecDBRecords& Records,
+	TVecInt& SelRecs, int nCount)
+{
+	TVecInt Temp;
+
+    for(int i=0; i<Records.size(); i++)
+    {
+		Temp.push_back(i);
+    }
+
+    for(int i=0; i<nCount; i++)
+    {
+                                    // genera tra gli indici rimasti disponibili
+        int nIndex = Temp.size() * float(rand())/float(RAND_MAX);
+
+        SelRecs.push_back(Temp[nIndex]);
+
+                                    // evita che il generatore di numeri casuali
+                                    // riselezioni da Temp un indice gia' generato.
+        TUtils::Remove(nIndex, Temp);
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsByIndices(TVecDBRecords& Records, TVecInt& Indices, TVecInt& SelRecs)
+{
+	for(int i=0; i < Indices.size(); i++)
+    {
+        for(int j=0; j < Records.size(); j++)
+        {
+            if( Records[j].nId == Indices[i] )
+            {
+				SelRecs.push_back(j);
+            }
+        }
+	}
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsWithFigures(TVecDBRecords& Records,
+	TVecInt& SelRecs, int nCount)
+{
+	TVecInt Temp;
+
+    for(int i=0; i<Records.size(); i++)
+    {
+									// considera solo i record con le immagini
+		if( Records[i].bHaveImage )
+        {
+			Temp.push_back(i);
+        }
+    }
+									// le domande con immagini annesse possono
+                                    // essere INFERIORI a quelle richieste in nCount
+	if( Temp.size() < nCount ) nCount = Temp.size();
+
+    for(int i=0; i<nCount; i++)
+    {
+		SelRecs.push_back( Temp[i] );
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsWithFiguresRnd(TVecDBRecords& Records,
+	TVecInt& SelRecs, int nCount)
+{
+	TVecInt Temp;
+
+    for(int i=0; i<Records.size(); i++)
+    {
+									// considera solo i record con le immagini
+		if( Records[i].bHaveImage )
+        {
+			Temp.push_back(i);
+        }
+    }
+									// le domande con immagine annesse possono
+                                    // essere INFERIORI a quelle richieste in nCount
+	if( Temp.size() < nCount ) nCount = Temp.size();
+
+    for(int i=0; i<nCount; i++)
+    {
+                                    // genera tra gli indici rimasti disponibili
+        int nIndex = Temp.size() * float(rand())/float(RAND_MAX);
+
+        SelRecs.push_back(Temp[nIndex]);
+
+                                    // evita che il generatore di numeri casuali
+                                    // riselezioni da Temp uno indice gia' generato.
+        TUtils::Remove(nIndex, Temp);
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsRnd(TVecDBRecords& Records,
+	int nTopicId, TVecInt& SelRecs, int nCount)
+{
+	TVecInt RecsByTopic, TempRecs;
+	SelectRecords(Records, nTopicId, RecsByTopic);
+
+											// ... a checks ...
+	if( nCount > RecsByTopic.size() )
+    {
+		//throw(Exception("Count is grater than items per topic"));
+		nCount = RecsByTopic.size();
+    }
+
+    for(int i=0; i<nCount; i++)
+    {
+        int nIndex = RecsByTopic.size() * float(rand())/float(RAND_MAX);
+
+        TempRecs.push_back( RecsByTopic[nIndex] );
+
+                                        // elimina dal vettore RecsByTopic
+                                        // l'indice appena selezionato
+                                        // per evitare che il generatore
+                                        // di numeri casuali generi un indice
+                                        // gia' esistente (sarebbe inutile e
+                                        // farebbe anche perdere tempo)
+        TUtils::Remove(nIndex, RecsByTopic);
+    }
+
+	for(int i=0; i<TempRecs.size(); i++)
+    {
+		SelRecs.push_back(TempRecs[i]);
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(TVecInt& SelRecs)
+{
+	SelectRecords(m_DB, SelRecs);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(TVecInt& SelRecs, int nCount)
+{
+	SelectRecords(m_DB, SelRecs, nCount);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(int nTopicId, TVecInt& SelRecs)
+{
+	SelectRecords(m_DB, nTopicId, SelRecs);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecords(int nTopicId, TVecInt& SelRecs, int nCount)
+{
+	SelectRecords(m_DB, nTopicId, SelRecs, nCount);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsRnd(TVecInt& SelRecs, int nCount)
+{
+	SelectRecordsRnd(m_DB, SelRecs, nCount);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsWithFigures(TVecInt& SelRecs, int nCount)
+{
+	SelectRecordsWithFigures(m_DB, SelRecs, nCount);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsWithFiguresRnd(TVecInt& SelRecs, int nCount)
+{
+	SelectRecordsWithFiguresRnd(m_DB, SelRecs, nCount);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsRnd(int nTopicId, TVecInt& SelRecs, int nCount)
+{
+	SelectRecordsRnd(m_DB, nTopicId, SelRecs, nCount);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SelectRecordsByIndices(TVecInt& Indices, TVecInt& SelRecs)
+{
+	SelectRecordsByIndices(m_DB, Indices, SelRecs);
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SearchInAnswers(AnsiString strKeyword,
+	TVecInt& SelRecs, bool bCaseSensitive)
+{
+	for(int i=0; i<m_DB.size(); i++)
+    {
+		for(int j=0; j<3; j++)
+        {
+			if( bCaseSensitive )
+            {
+                if( AnsiString(m_DB[i].strAnswers[j]).Pos(strKeyword) )
+                {
+					SelRecs.push_back(i);
+                    break;
+                }
+			}
+            else
+            {
+                if( AnsiString(m_DB[i].strAnswers[j]).LowerCase().Pos(strKeyword.LowerCase()) )
+                {
+					SelRecs.push_back(i);
+                    break;
+                }
+			}
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::SearchInQuestions(AnsiString strKeyword,
+	TVecInt& SelRecs, bool bCaseSensitive)
+{
+	for(int i=0; i<m_DB.size(); i++)
+    {
+		if( bCaseSensitive )
+        {
+			if( AnsiString(m_DB[i].strQuestion).Pos(strKeyword) )
+            {
+            	SelRecs.push_back(i);
+            }
+        }
+        else
+        {
+			if( AnsiString(m_DB[i].strQuestion).LowerCase().Pos(strKeyword.LowerCase()) )
+            {
+            	SelRecs.push_back(i);
+            }
+		}
+    }
+}
+
+//---------------------------------------------------------------------------
+//	SCOPO:
+//---------------------------------------------------------------------------
+void __fastcall TDataBanker::GetRecords(TVecInt& Indices, TVecDBRecords& SelRecs)
+{
+	for(int i=0; i<Indices.size(); i++)
+    {
+		SelRecs.push_back(m_DB[ Indices[i] ] );
+    }
+}
+
+//---------------------------------------------------------------------------
+
+

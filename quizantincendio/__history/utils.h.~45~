@@ -1,0 +1,36 @@
+//---------------------------------------------------------------------------
+#ifndef utilsH
+#define utilsH
+
+#include <vcl.h>
+#include <vector>
+
+#include "commdefs.h"
+
+using namespace std;
+
+typedef vector<TBitmap*> TVecPtrBitmaps;
+
+class TUtils
+{
+    public:
+        static bool __fastcall IsUnique(TVecInt& Ids);
+        static bool __fastcall IsUnique(int nId, TVecInt& Ids);
+
+
+        static void __fastcall LoadDataTest();
+
+        static void __fastcall BuildThePoster(AnsiString strPath, AnsiString strFileName);
+        static TBitmap* __fastcall PrintThePoster(TVecPtrBitmaps Images, int nRows);
+
+        static void __fastcall BuildThePosterLowRes(AnsiString strPath, AnsiString strFileName);
+        static TBitmap* __fastcall PrintThePosterLowRes(TVecPtrBitmaps Images, int nRows);
+
+        static void __fastcall BuildThePosterMidRes(AnsiString strPath, AnsiString strFileName);
+        static TBitmap* __fastcall PrintThePosterMidRes(TVecPtrBitmaps Images, int nRows);
+};
+
+//---------------------------------------------------------------------------
+#endif
+
+

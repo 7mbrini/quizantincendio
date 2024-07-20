@@ -1,0 +1,167 @@
+//---------------------------------------------------------------------------
+#ifndef TFormMainH
+#define TFormMainH
+
+//---------------------------------------------------------------------------
+#include <System.Classes.hpp>
+#include <Vcl.Controls.hpp>
+#include <Vcl.StdCtrls.hpp>
+#include <Vcl.Forms.hpp>
+#include <Vcl.ComCtrls.hpp>
+#include <Vcl.ExtCtrls.hpp>
+#include <Vcl.Menus.hpp>
+#include <Vcl.Buttons.hpp>
+#include <Vcl.Dialogs.hpp>
+#include <Vcl.Graphics.hpp>
+
+#include "TFormDBRecord.h"
+#include "TDataBanker.h"
+
+#include "utils.h"
+#include "commdefs.h"
+
+//---------------------------------------------------------------------------
+class TFormMain : public TForm
+{
+friend class TUtils;
+
+__published:	// IDE-managed Components
+	TMainMenu *MainMenu;
+	TMenuItem *File;
+	TMenuItem *FileExit;
+	TStatusBar *StatusBar;
+	TPanel *PanelTop;
+	TPanel *PanelClient;
+	TSpeedButton *SpeedButtonOpenDB;
+	TOpenDialog *OpenDBDialog;
+	TSpeedButton *SpeedButtonNewQuiz;
+	TMenuItem *Help;
+	TMenuItem *HelpAbout;
+	TPanel *Panel1;
+	TSpeedButton *SpeedButtonAbout;
+	TImage *Image;
+	TMenuItem *FileOpenDatabase;
+	TMenuItem *Settings;
+	TMenuItem *SettingsSetup;
+	TMenuItem *Quiz;
+	TMenuItem *NewQuiz;
+	TSpeedButton *SpeedButtonSetup;
+	TSpeedButton *SpeedButtonResults;
+	TPanel *PanelScrollClient;
+	TPanel *PanelStatus;
+	TLabel *LabelInfo;
+	TTimer *Timer;
+	TMenuItem *QuizShowResults;
+	TPanel *PanelScroller;
+	TScrollBar *ScrollBar;
+	TMenuItem *Tools;
+	TMenuItem *ToolsSearch;
+	TSpeedButton *SpeedButtonFind;
+	TMenuItem *N1;
+	void __fastcall FormCreate(TObject *Sender);
+	void __fastcall FileExitClick(TObject *Sender);
+	void __fastcall SpeedButtonOpenDBClick(TObject *Sender);
+	void __fastcall SpeedButtonNewQuizClick(TObject *Sender);
+	void __fastcall HelpAboutClick(TObject *Sender);
+	void __fastcall SpeedButtonAboutClick(TObject *Sender);
+	void __fastcall FileOpenDatabaseClick(TObject *Sender);
+	void __fastcall SettingsSetupClick(TObject *Sender);
+	void __fastcall NewQuizClick(TObject *Sender);
+	void __fastcall SpeedButtonSetupClick(TObject *Sender);
+	void __fastcall SpeedButtonResultsClick(TObject *Sender);
+	void __fastcall TimerTimer(TObject *Sender);
+	void __fastcall QuizShowResultsClick(TObject *Sender);
+	void __fastcall FormMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
+          TPoint &MousePos, bool &Handled);
+	void __fastcall FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+	void __fastcall ScrollBarScroll(TObject *Sender, TScrollCode ScrollCode, int &ScrollPos);
+	void __fastcall ToolsSearchClick(TObject *Sender);
+	void __fastcall FormShow(TObject *Sender);
+	void __fastcall SpeedButtonFindClick(TObject *Sender);
+
+
+private:	// User declarations
+
+public:		// User declarations
+	__fastcall TFormMain(TComponent* Owner);
+
+public:
+	bool __fastcall LoadDB();
+
+protected:
+bool m_bItsTooLate;
+TVecInt m_ErrorList;
+	TDateTime m_StartTime;
+TVecPtrXDBRecords m_pSelRecords;
+//TVecDBRecords m_pSelRecords;
+	int m_nScrollSize, m_nScrollPos;
+	TVecPtrFormDBRecords m_pPagedRecords;
+
+
+    void __fastcall Exit();
+	void __fastcall AboutBox();
+
+void __fastcall OpenDB();
+
+	bool __fastcall ItsTooLate() { return m_bItsTooLate; }
+bool __fastcall IsExamSimulation();
+
+	void __fastcall SetupPagedDBRecords();
+	void __fastcall SetPagedRecords(int nIndex);
+	void __fastcall ShowPagedRecords(bool bShow);
+	int __fastcall GetPos(TVecPtrFormDBRecords& PagedRecords, TFormDBRecord *pDBRecord);
+
+	void __fastcall Reset();
+	void __fastcall ResetScrolling();
+	void __fastcall DeleteRecords();
+    void __fastcall ClearPagedRecords();
+
+	void __fastcall DeleteErrorList();
+//	void __fastcall SaveTheErrorList();
+	void __fastcall ShowError(int nError);
+void __fastcall AddError(TVecInt& ErrorList, int nDBIndex);
+
+	bool __fastcall LoadDB(AnsiString strFileName);
+
+    void __fastcall MakeNewQuiz();
+	void __fastcall BuildTheQuiz();
+
+    void __fastcall DoSettings();
+	void __fastcall ShowResults();
+	void __fastcall ShowTheResults();
+
+	void __fastcall Find();
+
+	void __fastcall ShowStatus(AnsiString strStatus);
+    void __fastcall ShowInfo(AnsiString strInfo, TColor Color = clBlack);
+
+	void __fastcall EnableControls(bool bEnable);
+
+    void __fastcall TimerStop();
+    void __fastcall TimerStart();
+	void __fastcall TimerUpdate();
+
+    void __fastcall ScrollUp();
+    void __fastcall ScrollDown();
+    void __fastcall ScrollPageUp();
+    void __fastcall ScrollPageDown();
+    void __fastcall UpdateTheScroll();
+
+	void __fastcall SelectRecordsForExamSimulation(TVecInt& SelRecs);
+    void __fastcall LoadQuestions(TVecDBRecords& Records);
+    void __fastcall LoadQuestions(TVecDBRecords& Records, TVecInt& Ids);
+    void __fastcall LoadIndicesFromFile(AnsiString strFileName, TVecInt& nIndices);
+
+	void __fastcall debug_LoadDB();
+
+    void __fastcall UmDbRecord(TMessage& Message);
+
+    BEGIN_MESSAGE_MAP
+        MESSAGE_HANDLER(UM_QUESTION_CLICK, TMessage, UmDbRecord);
+    END_MESSAGE_MAP(TForm)
+};
+
+//---------------------------------------------------------------------------
+extern PACKAGE TFormMain *FormMain;
+//---------------------------------------------------------------------------
+#endif

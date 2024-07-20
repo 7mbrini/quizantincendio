@@ -1,0 +1,5 @@
+object DataBanker: TDataBanker
+  OldCreateOrder = False
+  Height = 363
+  Width = 549
+end

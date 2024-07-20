@@ -1,0 +1,67 @@
+object FormDebug: TFormDebug
+  Left = 0
+  Top = 0
+  Caption = 'Debug'
+  ClientHeight = 402
+  ClientWidth = 419
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Menu = MainMenu
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Image: TImage
+    Left = 0
+    Top = 0
+    Width = 419
+    Height = 402
+    Align = alClient
+    ExplicitLeft = 142
+    ExplicitTop = 164
+    ExplicitWidth = 105
+    ExplicitHeight = 105
+  end
+  object RichEdit: TRichEdit
+    Left = 0
+    Top = 0
+    Width = 419
+    Height = 402
+    Align = alClient
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'Verdana'
+    Font.Style = [fsBold]
+    ParentFont = False
+    ScrollBars = ssBoth
+    TabOrder = 0
+  end
+  object MainMenu: TMainMenu
+    Left = 207
+    Top = 60
+    object MenuFile: TMenuItem
+      Caption = '&File'
+      object FileSaveAs: TMenuItem
+        Caption = '&Save As ...'
+        OnClick = FileSaveAsClick
+      end
+    end
+    object MenuActions: TMenuItem
+      Caption = '&Actions'
+      object ActionsClear: TMenuItem
+        Caption = '&Clear'
+        OnClick = ActionsClearClick
+      end
+    end
+  end
+  object SaveDialog: TSaveDialog
+    DefaultExt = '*.txt'
+    Filter = 'Ascii text file|*.txt'
+    Left = 287
+    Top = 64
+  end
+end

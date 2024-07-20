@@ -1,0 +1,53 @@
+//----------------------------------------------------------------------------
+#ifndef TDlgAboutH
+#define TDlgAboutH
+
+//----------------------------------------------------------------------------
+/*
+//#include <vcl\System.hpp>
+//#include <vcl\Windows.hpp>
+//#include <vcl\SysUtils.hpp>
+//#include <vcl\Classes.hpp>
+#include <vcl\Graphics.hpp>
+#include <vcl\StdCtrls.hpp>
+#include <vcl\Forms.hpp>
+#include <vcl\Controls.hpp>
+#include <vcl\Buttons.hpp>
+#include <vcl\ExtCtrls.hpp>
+*/
+#include <vcl.h>
+#include <System.Classes.hpp>
+#include <Vcl.Controls.hpp>
+#include <Vcl.ExtCtrls.hpp>
+#include <Vcl.StdCtrls.hpp>
+#pragma hdrstop
+
+//----------------------------------------------------------------------------
+class TDlgAbout : public TForm
+{
+__published:
+	TButton *OKBtn;
+	TTimer *Timer;
+	TImage *Image1;
+	void __fastcall FormShow(TObject *Sender);
+	void __fastcall FormHide(TObject *Sender);
+	void __fastcall TimerTimer(TObject *Sender);
+	void __fastcall FormCreate(TObject *Sender);
+
+private:
+
+public:
+	virtual __fastcall TDlgAbout(TComponent* AOwner);
+
+protected:
+	int m_nStartFrame, m_nCurFrame;
+	TImage *m_pImage;
+
+	void __fastcall LoadImage();
+    void __fastcall PlaySound();
+};
+
+//----------------------------------------------------------------------------
+extern PACKAGE TDlgAbout *DlgAbout;
+//----------------------------------------------------------------------------
+#endif
